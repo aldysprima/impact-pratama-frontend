@@ -1,69 +1,57 @@
 import "./sidebar.css";
-import {
-  PermIdentity,
-  Storefront,
-  AttachMoney,
-  BarChart,
-  MailOutline,
-  DynamicFeed,
-  ChatBubbleOutline,
-  ExitToApp,
-  Settings,
-  Dashboard,
-} from "@mui/icons-material";
-import { Link } from "react-router-dom";
+import { Storefront, ExitToApp, Dashboard, Add } from "@mui/icons-material";
+import { Link, useLocation } from "react-router-dom";
 
 const Sidebar = () => {
+  const location = useLocation();
+  console.log(location.pathname);
   return (
     <div className="sidebar">
       <div className="sidebarWrapper">
         <div className="upperSidebar">
           <ul className="sidebarList">
             <Link to="/" className="link">
-              <li className="sidebarListItem">
+              <li
+                className="sidebarListItem"
+                style={
+                  location.pathname === "/"
+                    ? { backgroundColor: "#cecef3", borderRadius: "10px" }
+                    : null
+                }
+              >
                 <Dashboard className="sidebarIcon" />
                 Dashboard
               </li>
             </Link>
             <Link to="/products" className="link">
-              <li className="sidebarListItem">
+              <li
+                className="sidebarListItem"
+                style={
+                  location.pathname === "/products"
+                    ? { backgroundColor: "#cecef3", borderRadius: "10px" }
+                    : null
+                }
+              >
                 <Storefront className="sidebarIcon" />
                 Products
               </li>
             </Link>
-            <Link to="/users" className="link">
-              <li className="sidebarListItem">
-                <PermIdentity className="sidebarIcon" />
-                Users
+            <Link to="/addproduct" className="link">
+              <li
+                className="sidebarListItem"
+                style={
+                  location.pathname === "/addproduct"
+                    ? { backgroundColor: "#cecef3", borderRadius: "10px" }
+                    : null
+                }
+              >
+                <Add className="sidebarIcon" />
+                Add Product
               </li>
             </Link>
-            <li className="sidebarListItem">
-              <AttachMoney className="sidebarIcon" />
-              Transactions
-            </li>
-            <li className="sidebarListItem">
-              <BarChart className="sidebarIcon" />
-              Reports
-            </li>
-            <li className="sidebarListItem">
-              <MailOutline className="sidebarIcon" />
-              Mail
-            </li>
-            <li className="sidebarListItem">
-              <DynamicFeed className="sidebarIcon" />
-              Feedback
-            </li>
-            <li className="sidebarListItem">
-              <ChatBubbleOutline className="sidebarIcon" />
-              Messages
-            </li>
           </ul>
         </div>
         <div className="lowerSidebar">
-          <li className="sidebarListItem">
-            <Settings className="sidebarIcon" />
-            Settings
-          </li>
           <li className="sidebarListItem">
             <ExitToApp className="sidebarIcon" />
             Logout

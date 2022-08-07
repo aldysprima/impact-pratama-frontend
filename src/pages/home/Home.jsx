@@ -1,6 +1,7 @@
 import "./home.css";
 import Topbar from "../../components/topbar/Topbar";
 import Sidebar from "../../components/sidebar/Sidebar";
+import { Box, Typography } from "@mui/material";
 
 export default function Home() {
   return (
@@ -8,10 +9,17 @@ export default function Home() {
       <Topbar />
       <div className="homeWrapper">
         <Sidebar />
-        <div className="home">
-          Home
-          <div className="homeWidgets"></div>
-        </div>
+        <Box
+          display="flex"
+          flex={4}
+          justifyContent="center"
+          alignItems="center"
+          height="100vh"
+        >
+          <Typography variant="h4" fontWeight="bold">
+            Welcome to Admin Dashboard!
+          </Typography>
+        </Box>
       </div>
     </div>
   );
