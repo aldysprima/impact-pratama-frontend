@@ -1,5 +1,11 @@
 import Axios from "axios";
 
-const fetchProducts = () =>{
-    Axios.get
-}
+export const fetchProducts = (setProducts) => {
+  Axios.get("http://localhost:5000/api/products")
+    .then((respond) => {
+      setProducts(respond.data);
+    })
+    .catch((error) => {
+      console.log(error.response.data);
+    });
+};

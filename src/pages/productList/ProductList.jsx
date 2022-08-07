@@ -1,18 +1,12 @@
+import { useState, useEffect } from "react";
+import { DataGrid } from "@mui/x-data-grid";
 import "./productList.css";
 import Topbar from "../../components/topbar/Topbar";
 import Sidebar from "../../components/sidebar/Sidebar";
-import {
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Paper,
-  Button,
-} from "@mui/material";
-import { useState, useEffect } from "react";
-import Axios from "axios";
+import { fetchProducts } from "../../utils/apiCalls";
+import { Button } from "@mui/material";
+import { Link } from "react-router-dom";
+import { Delete, Edit } from "@mui/icons-material";
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
@@ -20,13 +14,7 @@ export default function ProductList() {
   const [deleteId, setDeleteId] = useState(null);
 
   useEffect(() => {
-    Axios.get("http://localhost:5000/api/products")
-      .then((respond) => {
-        setProducts(respond.data);
-      })
-      .catch((error) => {
-        console.log(error.response.data);
-      });
+    fetchProducts(setProducts);
   }, []);
 
   const onBtnDelete = (id) => {
@@ -35,60 +23,102 @@ export default function ProductList() {
   const onBtnEdit = (id) => {
     setEditId(id);
   };
-  console.log(deleteId);
-  console.log(editId);
+
+  const columns = [
+    {
+      field: "id",
+      headerName: "Product Code",
+      width: 150,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "name",
+      headerName: "Name",
+      width: 200,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "description",
+      headerName: "Description",
+      width: 250,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "price",
+      headerName: "Price",
+      width: 120,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "unit",
+      headerName: "UOM",
+      width: 100,
+      headerAlign: "center",
+      align: "center",
+    },
+    {
+      field: "action",
+      headerName: "Action",
+      width: 200,
+      headerAlign: "center",
+      align: "center",
+      renderCell: (params) => {
+        return (
+          <>
+            <Link
+              to={"/product/" + params.row.id}
+              style={{ textDecoration: "none", fontSize: "10px" }}
+            >
+              <Button
+                variant="outlined"
+                color={"error"}
+                sx={{
+                  textTransform: "capitalize",
+                  marginRight: "5px",
+                }}
+                startIcon={<Edit />}
+                onClick={() => onBtnEdit(params.row.id)}
+              >
+                Edit
+              </Button>
+            </Link>
+
+            <Button
+              variant="outlined"
+              sx={{
+                textTransform: "capitalize",
+                marginRight: "10px",
+              }}
+              startIcon={<Delete />}
+              onClick={() => onBtnDelete(params.row.id)}
+            >
+              Delete
+            </Button>
+          </>
+        );
+      },
+    },
+  ];
+
   return (
     <div>
       <Topbar />
       <div className="productlistWrapper">
         <Sidebar />
         <div className="productList">
-          <TableContainer component={Paper} sx={{ maxHeight: "90vh" }}>
-            <Table size="small" stickyHeader>
-              <TableHead>
-                <TableRow align="center">
-                  <TableCell align="center">Product Code</TableCell>
-                  <TableCell align="center">Name</TableCell>
-                  <TableCell align="center">Description</TableCell>
-                  <TableCell align="center">Price</TableCell>
-                  <TableCell align="center">UOM</TableCell>
-                  <TableCell align="center">Action</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {products.map((row) => {
-                  return (
-                    <TableRow key={row.id}>
-                      <TableCell align="center">{row.id}</TableCell>
-                      <TableCell align="center">{row.name}</TableCell>
-                      <TableCell align="center">{row.description}</TableCell>
-                      <TableCell align="center">{row.price}</TableCell>
-                      <TableCell align="center">{row.unit}</TableCell>
-                      <TableCell>
-                        <Button
-                          variant="outlined"
-                          color="primary"
-                          onClick={() => onBtnEdit(row.id)}
-                          sx={{
-                            marginRight: "2px",
-                          }}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          variant="outlined"
-                          color="error"
-                          onClick={() => onBtnDelete(row.id)}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <DataGrid
+            rows={products}
+            disableSelectionOnClick
+            columns={columns}
+            getRowId={(row) => row.id}
+            pageSize={10}
+            rowsPerPageOptions={[5, 10, 20]}
+            checkboxSelection
+          />
         </div>
       </div>
     </div>

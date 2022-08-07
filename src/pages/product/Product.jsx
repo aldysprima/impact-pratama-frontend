@@ -70,7 +70,7 @@ export default function Product() {
                     alt=""
                     className="productUploadImg"
                   />
-                  <label for="file">
+                  <label>
                     <Publish />
                   </label>
                   <input type="file" id="file" style={{ display: "none" }} />
