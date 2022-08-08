@@ -3,25 +3,32 @@ import { DataGrid } from "@mui/x-data-grid";
 import "./productList.css";
 import Topbar from "../../components/topbar/Topbar";
 import Sidebar from "../../components/sidebar/Sidebar";
-import { fetchProducts } from "../../utils/apiCalls";
+import { fetchProducts, deleteProduct } from "../../utils/apiCalls";
 import { Button } from "@mui/material";
 import { Link } from "react-router-dom";
-import { Delete, Edit } from "@mui/icons-material";
+import { Add, Delete, Edit } from "@mui/icons-material";
+import StyledModal from "../../components/StyledModal";
+import { toast } from "react-toastify";
 
 export default function ProductList() {
   const [products, setProducts] = useState([]);
-  const [editId, setEditId] = useState(null);
+  const [open, setOpen] = useState(false);
   const [deleteId, setDeleteId] = useState(null);
+  const [name, setName] = useState("");
 
   useEffect(() => {
     fetchProducts(setProducts);
   }, []);
 
-  const onBtnDelete = (id) => {
+  const onBtnDelete = (id, name) => {
     setDeleteId(id);
+    setName(name);
+    setOpen(true);
   };
-  const onBtnEdit = (id) => {
-    setEditId(id);
+
+  const confirmDelete = (deleteId, setProducts) => {
+    deleteProduct(deleteId, setProducts, toast);
+    setOpen(false);
   };
 
   const columns = [
@@ -81,7 +88,6 @@ export default function ProductList() {
                   marginRight: "5px",
                 }}
                 startIcon={<Edit />}
-                onClick={() => onBtnEdit(params.row.id)}
               >
                 Edit
               </Button>
@@ -94,7 +100,7 @@ export default function ProductList() {
                 marginRight: "10px",
               }}
               startIcon={<Delete />}
-              onClick={() => onBtnDelete(params.row.id)}
+              onClick={() => onBtnDelete(params.row.id, params.row.name)}
             >
               Delete
             </Button>
@@ -110,6 +116,14 @@ export default function ProductList() {
       <div className="productlistWrapper">
         <Sidebar />
         <div className="productList">
+          <Link
+            to={"/addproduct"}
+            style={{ textDecoration: "none", fontSize: "10px" }}
+          >
+            <Button startIcon={<Add />} variant="outlined">
+              Add Product
+            </Button>
+          </Link>
           <DataGrid
             rows={products}
             disableSelectionOnClick
@@ -118,6 +132,14 @@ export default function ProductList() {
             pageSize={10}
             rowsPerPageOptions={[5, 10, 20]}
             checkboxSelection
+          />
+          <StyledModal
+            open={open}
+            onClose={(e) => setOpen(false)}
+            onCancel={(e) => setOpen(false)}
+            onConfirm={(e) => confirmDelete(deleteId, setProducts)}
+            action="Delete"
+            value={name}
           />
         </div>
       </div>
