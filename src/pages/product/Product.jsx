@@ -1,84 +1,127 @@
-import { Link } from "react-router-dom";
 import "./product.css";
-import { Publish } from "@mui/icons-material";
+import { Save } from "@mui/icons-material";
 import Topbar from "../../components/topbar/Topbar";
 import Sidebar from "../../components/sidebar/Sidebar";
+import {
+  Button,
+  Stack,
+  TextField,
+  Typography,
+  Box,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import { useParams, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { fetchProductById, updateProduct } from "../../utils/apiCalls";
+import StyledModal from "../../components/StyledModal";
+import { toast } from "react-toastify";
 
 export default function Product() {
+  const [open, setOpen] = useState(false);
+  const [product, setProduct] = useState({});
+  const [uom, setUom] = useState("");
+  const params = useParams();
+  const nameRef = useRef("");
+  const descRef = useRef("");
+  const priceRef = useRef("");
+  const navigate = useNavigate();
+
+  console.log("PRODUCT PAGE :", product);
+
+  const uomHandleChange = (e) => {
+    setUom(e.target.value);
+  };
+
+  const onBtnSave = () => {
+    setOpen(true);
+  };
+
+  const onConfirmChange = () => {
+    let newProductData = {};
+    if (nameRef.current.value) {
+      newProductData.name = nameRef.current.value;
+    }
+    if (descRef.current.value) {
+      newProductData.description = descRef.current.value;
+    }
+    if (priceRef.current.value) {
+      newProductData.price = priceRef.current.value;
+    }
+    if (uom) {
+      newProductData.uom_id = uom;
+    }
+
+    updateProduct(params.productId, newProductData, toast, navigate);
+  };
+
+  useEffect(() => {
+    fetchProductById(params.productId, setProduct);
+  }, []);
+
+  console.log("PRODUCT :", product);
   return (
     <div>
       <Topbar />
       <div className="productWrapper">
         <Sidebar />
         <div className="product">
-          <div className="productTitleContainer">
-            <h1 className="productTitle">Edit Product</h1>
-            <Link to="/newproduct">
-              <button className="productAddButton">Create</button>
-            </Link>
-          </div>
-          <div className="productTop">
-            <div className="productTopRight">
-              <div className="productInfoTop">
-                <img
-                  src="https://images.pexels.com/photos/7156886/pexels-photo-7156886.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
-                  alt=""
-                  className="productInfoImg"
-                />
-                <span className="productName">Apple Airpods</span>
-              </div>
-              <div className="productInfoBottom">
-                <div className="productInfoItem">
-                  <span className="productInfoKey">id:</span>
-                  <span className="productInfoValue">123</span>
-                </div>
-                <div className="productInfoItem">
-                  <span className="productInfoKey">sales:</span>
-                  <span className="productInfoValue">5123</span>
-                </div>
-                <div className="productInfoItem">
-                  <span className="productInfoKey">active:</span>
-                  <span className="productInfoValue">yes</span>
-                </div>
-                <div className="productInfoItem">
-                  <span className="productInfoKey">in stock:</span>
-                  <span className="productInfoValue">no</span>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div className="productBottom">
-            <form className="productForm">
-              <div className="productFormLeft">
-                <label>Product Name</label>
-                <input type="text" placeholder="Apple AirPod" />
-                <label>In Stock</label>
-                <select name="inStock" id="idStock">
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-                <label>Active</label>
-                <select name="active" id="active">
-                  <option value="yes">Yes</option>
-                  <option value="no">No</option>
-                </select>
-              </div>
-              <div className="productFormRight">
-                <div className="productUpload">
-                  <img
-                    src="https://images.pexels.com/photos/7156886/pexels-photo-7156886.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500"
-                    alt=""
-                    className="productUploadImg"
-                  />
-                  <label>
-                    <Publish />
-                  </label>
-                  <input type="file" id="file" style={{ display: "none" }} />
-                </div>
-                <button className="productButton">Update</button>
-              </div>
-            </form>
-          </div>
+          <Box
+            height="30vh"
+            sx={{
+              border: "1px solid black",
+              marginBottom: "10px",
+              padding: "10px",
+            }}
+          >
+            <Typography variant="p" fontSize="24px" fontWeight={600}>
+              Product Info
+            </Typography>
+            <Stack spacing={1} marginTop="5px">
+              <Typography>Product Code : {product.id}</Typography>
+              <Typography>Name : {product.name}</Typography>
+              <Typography>Description : {product.description}</Typography>
+              <Typography>Price : {product.price}</Typography>
+              <Typography>UOM : {product.unit}</Typography>
+            </Stack>
+          </Box>
+          <Typography variant="p" fontSize="24px" fontWeight={600}>
+            Edit Product
+          </Typography>
+
+          <Stack minHeight="50vh" spacing={2} maxWidth="500px" marginTop="15px">
+            <TextField label="Name" variant="outlined" inputRef={nameRef} />
+            <TextField
+              label="Description"
+              variant="outlined"
+              inputRef={descRef}
+            />
+            <TextField label="Price" variant="outlined" inputRef={priceRef} />
+            <Box sx={{ width: "250px" }}>
+              <FormControl fullWidth>
+                <InputLabel>UOM</InputLabel>
+                <Select value={uom} label="UOM" onChange={uomHandleChange}>
+                  <MenuItem value={1}>Sheet</MenuItem>
+                  <MenuItem value={2}>Roll</MenuItem>
+                  <MenuItem value={3}>Pcs</MenuItem>
+                </Select>
+              </FormControl>
+            </Box>
+
+            <Button startIcon={<Save />} variant="outlined" onClick={onBtnSave}>
+              Save
+            </Button>
+          </Stack>
+          <StyledModal
+            open={open}
+            onClose={(e) => setOpen(false)}
+            onCancel={(e) => setOpen(false)}
+            onConfirm={onConfirmChange}
+            action="Change"
+            value={product.name}
+          />
         </div>
       </div>
     </div>

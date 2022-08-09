@@ -34,3 +34,24 @@ export const addProduct = (newProduct, toast, navigate) => {
       console.log(error.response.data);
     });
 };
+
+export const fetchProductById = (productId, setProduct) => {
+  Axios.get(BASE_URL + `product/${productId}`)
+    .then((respond) => {
+      setProduct(respond.data);
+    })
+    .catch((error) => {
+      console.log(error.response.data);
+    });
+};
+
+export const updateProduct = (productId, newProductData, toast, navigate) => {
+  Axios.patch(BASE_URL + `updateProduct/${productId}`, newProductData)
+    .then((respond) => {
+      toast.success(respond.data);
+      navigate("/products");
+    })
+    .catch((error) => {
+      toast.error(error.response.data);
+    });
+};
